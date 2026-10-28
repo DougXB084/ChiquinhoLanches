@@ -1,0 +1,484 @@
+
+/* ========================================
+   CHIQUINHO LANCHES — DESIGN SYSTEM
+   ======================================== */
+
+:root {
+    --primary: #b91c1c;
+    --primary-dark: #991b1b;
+    --primary-light: #fef2f2;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #15803d;
+    --radius: 14px;
+    --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    --shadow-hover: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+/* Reset */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    color: var(--text);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+main {
+    flex: 1;
+    width: 100%;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* Navbar */
+
+header {
+    position: relative;
+    z-index: 10;
+}
+
+.navbar {
+    min-height: 76px;
+    padding: 14px max(5%, calc((100% - 1200px) / 2));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+    white-space: nowrap;
+}
+
+.navbar-logo:hover {
+    color: var(--primary);
+}
+
+.navbar-logo img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.navbar-links a {
+    padding: 9px 14px;
+    border-radius: 9px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.navbar-links a:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.navbar-links .navbar-login {
+    margin-left: 6px;
+    padding: 10px 20px;
+    background: var(--primary);
+    color: #fff;
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.navbar-links .navbar-login:hover {
+    background: var(--primary-dark);
+    color: #fff;
+}
+
+/* Conteúdo e títulos */
+
+.container,
+.page-container {
+    width: min(100% - 40px, 1200px);
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin-top: 0;
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+}
+
+h1 {
+    margin-bottom: 12px;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+}
+
+h2 {
+    font-size: 26px;
+    font-weight: 750;
+}
+
+h3 {
+    font-size: 19px;
+    font-weight: 700;
+}
+
+p {
+    margin-top: 0;
+}
+
+.muted,
+.text-muted {
+    color: var(--text-muted);
+}
+
+/* Cards */
+
+.card {
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+/* Botões */
+
+.btn,
+button[type="submit"],
+input[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 11px 20px;
+    background: var(--primary);
+    color: #fff;
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    font-weight: 700;
+    text-align: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn:hover,
+button[type="submit"]:hover,
+input[type="submit"]:hover {
+    background: var(--primary-dark);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #fff;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover {
+    background: #f1f5f9;
+    color: var(--text);
+}
+
+/* Formulários */
+
+form {
+    width: 100%;
+}
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select,
+textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 13px;
+    color: var(--text);
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12);
+}
+
+form p {
+    margin-bottom: 18px;
+}
+
+/* Tabelas */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+thead {
+    background: #f1f5f9;
+}
+
+th,
+td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    color: #475569;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+tbody tr:hover {
+    background: #fafafa;
+}
+
+/* Mensagens do Django */
+
+.messages {
+    width: min(100% - 40px, 1200px);
+    margin: 20px auto 0;
+    padding: 0;
+    list-style: none;
+}
+
+.messages li {
+    margin-bottom: 10px;
+    padding: 14px 18px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+}
+
+.messages .success {
+    background: #f0fdf4;
+    color: var(--success);
+    border-color: #bbf7d0;
+}
+
+.messages .error {
+    background: #fef2f2;
+    color: var(--primary-dark);
+    border-color: #fecaca;
+}
+
+/* Footer */
+
+footer {
+    margin-top: auto;
+    padding: 40px 24px 20px;
+    background: #171717;
+    color: #d4d4d8;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 32px;
+    width: min(100%, 1200px);
+    margin: 0 auto;
+}
+
+.footer-brand h2 {
+    margin-bottom: 10px;
+    color: #fff;
+    font-size: 22px;
+}
+
+.footer-brand p {
+    max-width: 380px;
+    margin-bottom: 0;
+    color: #a1a1aa;
+    font-size: 14px;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.footer-links a {
+    color: #d4d4d8;
+    font-size: 14px;
+}
+
+.footer-links a:hover {
+    color: #fff;
+}
+
+.footer-bottom {
+    grid-column: 1 / -1;
+    margin-top: 8px;
+    padding-top: 20px;
+    border-top: 1px solid #3f3f46;
+    color: #a1a1aa;
+    font-size: 13px;
+    text-align: center;
+}
+
+.footer-bottom p {
+    margin: 0;
+}
+
+/* Responsividade */
+
+@media (max-width: 760px) {
+    .navbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+        padding: 16px 20px;
+    }
+
+    .navbar-links {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .navbar-links a {
+        padding: 9px 10px;
+    }
+
+    .navbar-links .navbar-login {
+        margin-left: 0;
+    }
+
+    .container,
+    .page-container {
+        width: min(100% - 32px, 1200px);
+        padding: 28px 0;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .footer-bottom {
+        grid-column: 1;
+    }
+
+    .card {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-logo {
+        font-size: 19px;
+    }
+
+    .navbar-links a {
+        font-size: 13px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+}
