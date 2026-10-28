@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiquinho Lanches</title>
+</head>
+<body>
+    <header>
+        {% include "fragments/_header.html" %}
+    </header>
+    
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        {% include "fragments/_footer.html" %}
+    </footer>
+</body>
+</html>
