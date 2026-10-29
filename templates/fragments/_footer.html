@@ -1,1 +1,19 @@
-Footer massa, porém provisorio
+
+{% load static %}
+
+<div class="footer-content">
+    <div class="footer-brand">
+        <h2>Chiquinho Lanches</h2>
+        <p>Sua cantina escolar em um só lugar.</p>
+    </div>
+
+    <div class="footer-links">
+        <a href="/">Início</a>
+        <a href="/cardapio/">Cardápio</a>
+        <a href="/meus-pedidos/">Meus pedidos</a>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; {% now "Y" %} Chiquinho Lanches. Todos os direitos reservados.</p>
+    </div>
+</div>
