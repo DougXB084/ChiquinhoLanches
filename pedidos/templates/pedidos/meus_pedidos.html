@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Meus pedidos — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1>Meus pedidos</h1>
+
+    {% if total_pedidos %}
+        {% if em_andamento %}
+        <section class="secao">
+            <h2>Em andamento</h2>
+            <div class="pedidos-lista">
+                {% for pedido in em_andamento %}
+                    {% include "pedidos/_pedido_resumo.html" %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if anteriores %}
+        <section class="secao">
+            <h2>Anteriores</h2>
+            <div class="pedidos-lista">
+                {% for pedido in anteriores %}
+                    {% include "pedidos/_pedido_resumo.html" %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    {% else %}
+    <div class="vazio card">
+        <h3>Você ainda não fez pedidos</h3>
+        <p class="muted">Quando fizer o primeiro, ele aparece aqui para você acompanhar.</p>
+        <a href="{% url 'produtos:cardapio' %}" class="btn">Ver cardápio</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

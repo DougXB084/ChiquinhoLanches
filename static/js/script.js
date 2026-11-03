@@ -1,113 +1,135 @@
+/* Chiquinho Lanches — comportamentos leves das páginas */
 
-function obterCarrinho() {
-    try {
-        return JSON.parse(
-            localStorage.getItem("chiquinho_carrinho")
-        ) || [];
-    } catch {
-        return [];
-    }
-}
+document.addEventListener("DOMContentLoaded", () => {
 
-function salvarCarrinho(carrinho) {
-    localStorage.setItem(
-        "chiquinho_carrinho",
-        JSON.stringify(carrinho)
-    );
-}
-
-function adicionarCarrinho(nome, preco) {
-    const carrinho = obterCarrinho();
-
-    preco = Number(String(preco).replace(",", "."));
-
-    if (!Number.isFinite(preco) || preco < 0) {
-        alert("Preço inválido para este produto.");
-        return;
-    }
-
-    const produto = carrinho.find(item => item.nome === nome);
-
-    if (produto) {
-        produto.quantidade++;
-    } else {
-        carrinho.push({
-            nome,
-            preco,
-            quantidade: 1
+    /* Menu do celular */
+    const navbar = document.querySelector(".navbar");
+    const toggle = document.querySelector(".navbar-toggle");
+    if (navbar && toggle) {
+        toggle.addEventListener("click", () => {
+            const aberto = navbar.classList.toggle("aberto");
+            toggle.setAttribute("aria-expanded", String(aberto));
+            toggle.setAttribute("aria-label", aberto ? "Fechar menu" : "Abrir menu");
         });
     }
 
-    salvarCarrinho(carrinho);
-    alert(`${nome} adicionado ao carrinho!`);
-}
+    /* Mensagens do Django somem sozinhas */
+    document.querySelectorAll(".messages li").forEach((item) => {
+        setTimeout(() => {
+            item.classList.add("saindo");
+            setTimeout(() => item.remove(), 400);
+        }, 6000);
+    });
 
-function renderizarCarrinho() {
-    const container = document.getElementById("itens-carrinho");
-    const totalElement = document.getElementById("total-carrinho");
+    /* Seletor de quantidade (+ / −) */
+    document.querySelectorAll(".stepper").forEach((stepper) => {
+        const campo = stepper.querySelector("input[type='number']");
+        const form = stepper.closest("form");
 
-    if (!container || !totalElement) return;
+        const enviarSeNecessario = () => {
+            if (form && form.hasAttribute("data-autosubmit")) {
+                form.requestSubmit();
+            }
+        };
 
-    const carrinho = obterCarrinho();
-    container.replaceChildren();
-
-    if (carrinho.length === 0) {
-        const mensagem = document.createElement("p");
-        mensagem.className = "empty-state";
-        mensagem.textContent = "Seu carrinho está vazio.";
-        container.appendChild(mensagem);
-        totalElement.textContent = "R$ 0,00";
-        return;
-    }
-
-    let total = 0;
-
-    carrinho.forEach((item, index) => {
-        const subtotal = item.preco * item.quantidade;
-        total += subtotal;
-
-        const linha = document.createElement("div");
-        linha.className = "cart-item";
-
-        const descricao = document.createElement("span");
-        descricao.textContent =
-            `${item.nome} × ${item.quantidade} — ` +
-            subtotal.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL"
+        stepper.querySelectorAll("[data-step]").forEach((botao) => {
+            botao.addEventListener("click", () => {
+                const passo = Number(botao.dataset.step);
+                const minimo = Number(campo.min || 1);
+                const maximo = campo.max ? Number(campo.max) : Infinity;
+                const atual = Number(campo.value) || minimo;
+                const novo = Math.min(Math.max(atual + passo, minimo), maximo);
+                if (novo === atual) return;
+                campo.value = novo;
+                enviarSeNecessario();
             });
-
-        const remover = document.createElement("button");
-        remover.className = "btn btn-secondary btn-small";
-        remover.type = "button";
-        remover.textContent = "Remover";
-
-        remover.addEventListener("click", () => {
-            const atualizado = obterCarrinho();
-            atualizado.splice(index, 1);
-            salvarCarrinho(atualizado);
-            renderizarCarrinho();
         });
 
-        linha.append(descricao, remover);
-        container.appendChild(linha);
+        campo.addEventListener("change", enviarSeNecessario);
     });
 
-    totalElement.textContent = total.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-    });
-}
-
-function finalizarPedido() {
-    const carrinho = obterCarrinho();
-
-    if (!carrinho.length) {
-        alert("Seu carrinho está vazio!");
-        return;
+    /* Busca instantânea no cardápio (o envio do formulário continua funcionando) */
+    const busca = document.querySelector("[data-filtro-cardapio]");
+    const cartoes = document.querySelectorAll("#lista-produtos .produto-card");
+    const semResultados = document.getElementById("sem-resultados");
+    if (busca && cartoes.length) {
+        const filtrar = () => {
+            const termo = busca.value.trim().toLowerCase();
+            let visiveis = 0;
+            cartoes.forEach((cartao) => {
+                const mostrar = !termo || cartao.dataset.nome.includes(termo);
+                cartao.hidden = !mostrar;
+                if (mostrar) visiveis += 1;
+            });
+            if (semResultados) semResultados.hidden = visiveis > 0;
+        };
+        busca.addEventListener("input", filtrar);
+        filtrar();
     }
 
-    alert("A finalização de pedidos será integrada ao sistema em outra etapa.");
-}
+    /* Máscaras de CPF e telefone */
+    const somenteDigitos = (v) => v.replace(/\D/g, "");
+    const mascaras = {
+        cpf: (v) => {
+            const d = somenteDigitos(v).slice(0, 11);
+            return d
+                .replace(/^(\d{3})(\d)/, "$1.$2")
+                .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+                .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+        },
+        telefone: (v) => {
+            const d = somenteDigitos(v).slice(0, 11);
+            if (d.length <= 2) return d;
+            if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+            if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+            return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+        },
+    };
+    document.querySelectorAll("[data-mascara]").forEach((campo) => {
+        const aplicar = mascaras[campo.dataset.mascara];
+        if (!aplicar) return;
+        campo.addEventListener("input", () => { campo.value = aplicar(campo.value); });
+        if (campo.value) campo.value = aplicar(campo.value);
+    });
 
-document.addEventListener("DOMContentLoaded", renderizarCarrinho);
+    /* Confirmação antes de ações irreversíveis */
+    document.querySelectorAll("form[data-confirm]").forEach((form) => {
+        form.addEventListener("submit", (evento) => {
+            if (!window.confirm(form.dataset.confirm)) {
+                evento.preventDefault();
+            }
+        });
+    });
+
+    /* Tela de status: recarrega quando a cantina muda o status do pedido */
+    const acompanhamento = document.querySelector("[data-status-url]");
+    if (acompanhamento) {
+        const url = acompanhamento.dataset.statusUrl;
+        const statusAtual = acompanhamento.dataset.statusAtual;
+        setInterval(async () => {
+            if (document.hidden) return;
+            try {
+                const resposta = await fetch(url, { headers: { Accept: "application/json" } });
+                if (!resposta.ok) return;
+                const dados = await resposta.json();
+                if (dados.status !== statusAtual) window.location.reload();
+            } catch (erro) {
+                /* sem conexão: tenta de novo no próximo ciclo */
+            }
+        }, 15000);
+    }
+
+    /* Painel da cantina: atualiza a fila sozinho */
+    const painel = document.querySelector("[data-auto-reload]");
+    if (painel) {
+        const segundos = Number(painel.dataset.autoReload) || 30;
+        setInterval(() => {
+            if (document.hidden) return;
+            // Não recarrega enquanto alguém está escrevendo uma justificativa.
+            const digitando = document.querySelector(".cancelar-pedido[open]");
+            const comTexto = [...document.querySelectorAll(".cancelar-pedido textarea")].some((t) => t.value.trim());
+            if (digitando || comTexto) return;
+            window.location.reload();
+        }, segundos * 1000);
+    }
+});

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Itens do cardápio — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="pagina-topo">
+        <div>
+            <h1>Itens do cardápio</h1>
+            <p class="muted">Adicione, edite ou remova os itens que os alunos veem.</p>
+        </div>
+        <div class="acoes-topo">
+            <a href="{% url 'produtos:cardapio' %}" class="btn btn-secondary">Ver como aluno</a>
+            <a href="{% url 'produtos:criar' %}" class="btn">Adicionar item</a>
+        </div>
+    </div>
+
+    {% if produtos %}
+    <div class="tabela-rolagem card">
+        <table class="tabela-itens">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Categoria</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Situação</th>
+                    <th><span class="sr-only">Ações</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto in produtos %}
+                <tr>
+                    <td><strong>{{ produto.nome }}</strong></td>
+                    <td data-label="Categoria">{{ produto.categoria.nome }}</td>
+                    <td data-label="Preço">R$ {{ produto.preco|floatformat:2 }}</td>
+                    <td data-label="Estoque">{{ produto.estoque }}</td>
+                    <td data-label="Situação">
+                        {% if not produto.ativo %}<span class="status status-cancelado">Inativo</span>
+                        {% elif produto.estoque == 0 %}<span class="status status-pendente">Esgotado</span>
+                        {% else %}<span class="status status-pronto">À venda</span>{% endif %}
+                    </td>
+                    <td class="acoes-linha">
+                        <a href="{% url 'produtos:editar' produto.pk %}" class="btn btn-secondary btn-pequeno">Editar</a>
+                        <form method="post" action="{% url 'produtos:remover' produto.pk %}" data-confirm="Remover {{ produto.nome }} do cardápio?">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-link btn-perigo">Remover</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="vazio card">
+        <h3>O cardápio está vazio</h3>
+        <p class="muted">Adicione o primeiro item para os alunos começarem a pedir.</p>
+        <a href="{% url 'produtos:criar' %}" class="btn">Adicionar item</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

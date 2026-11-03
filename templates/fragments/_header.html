@@ -1,16 +1,38 @@
+
 {% load static %}
 
 <nav class="navbar">
-    <a href="/" class="navbar-logo">
+    <a href="{% url 'core:home' %}" class="navbar-logo">
         <img src="{% static 'img/logo.png' %}" alt="Chiquinho Lanches">
         <span>Chiquinho Lanches</span>
     </a>
 
-    <div class="navbar-links">
-        <a href="/">Início</a>
-        <a href="/cardapio/">Cardápio</a>
-        <a href="/carrinho/">Carrinho</a>
-        <a href="/meus-pedidos/">Meus pedidos</a>
-        <a href="/login/" class="navbar-login">Entrar</a>
+    <button type="button" class="navbar-toggle" aria-controls="navbar-links" aria-expanded="false" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+    </button>
+
+    <div class="navbar-links" id="navbar-links">
+        {% if usuario_funcionario %}
+            <a href="{% url 'pedidos:painel' %}" {% if request.resolver_match.view_name == 'pedidos:painel' or request.resolver_match.view_name == 'pedidos:status' %}aria-current="page"{% endif %}>Painel</a>
+            <a href="{% url 'produtos:gerenciar' %}" {% if request.resolver_match.url_name == 'gerenciar' or request.resolver_match.url_name == 'criar' or request.resolver_match.url_name == 'editar' %}aria-current="page"{% endif %}>Itens do cardápio</a>
+            <a href="{% url 'usuarios:cadastro_funcionario' %}" {% if request.resolver_match.url_name == 'cadastro_funcionario' %}aria-current="page"{% endif %}>Novo funcionário</a>
+        {% else %}
+            <a href="{% url 'core:home' %}" {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Início</a>
+            <a href="{% url 'produtos:cardapio' %}" {% if request.resolver_match.url_name == 'cardapio' or request.resolver_match.url_name == 'detalhe' %}aria-current="page"{% endif %}>Cardápio</a>
+            <a href="{% url 'pedidos:carrinho' %}" {% if request.resolver_match.view_name == 'pedidos:carrinho' %}aria-current="page"{% endif %}>
+                Carrinho{% if carrinho_quantidade %} <span class="badge-contador">{{ carrinho_quantidade }}</span>{% endif %}
+            </a>
+            <a href="{% url 'pedidos:meus_pedidos' %}" {% if request.resolver_match.view_name == 'pedidos:meus_pedidos' or request.resolver_match.view_name == 'pedidos:status' %}aria-current="page"{% endif %}>Meus pedidos</a>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'usuarios:perfil' %}" class="navbar-user" {% if request.resolver_match.view_name == 'usuarios:perfil' %}aria-current="page"{% endif %}>{{ user.first_name|default:user.username }}</a>
+            <form method="post" action="{% url 'usuarios:logout' %}" class="navbar-logout">
+                {% csrf_token %}
+                <button type="submit" class="btn-link">Sair</button>
+            </form>
+        {% else %}
+            <a href="{% url 'usuarios:login' %}" class="navbar-login">Entrar</a>
+        {% endif %}
     </div>
 </nav>

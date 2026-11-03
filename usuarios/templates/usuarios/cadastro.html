@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if funcionario %}Cadastrar funcionário{% else %}Criar conta{% endif %} — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="auth-pagina">
+    <section class="card auth-card auth-card-largo">
+        {% if funcionario %}
+            <h1>Cadastrar funcionário</h1>
+            <p class="muted">O funcionário entra com a matrícula e a senha definidas aqui e acessa a área da cantina.</p>
+        {% else %}
+            <img src="{% static 'img/logo.png' %}" alt="" class="auth-logo">
+            <h1>Criar conta</h1>
+            <p class="muted">Leva menos de um minuto. A cantina usa sua matrícula ou CPF para identificar seu pedido.</p>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if not funcionario %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+            {% if form.non_field_errors %}
+            <div class="alerta-erro" role="alert">
+                {% for erro in form.non_field_errors %}<p>{{ erro }}</p>{% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="campos-duplos">
+                {% include "partials/_campo.html" with campo=form.first_name %}
+                {% include "partials/_campo.html" with campo=form.last_name %}
+            </div>
+            {% include "partials/_campo.html" with campo=form.email %}
+            <div class="campos-duplos">
+                {% include "partials/_campo.html" with campo=form.matricula %}
+                {% include "partials/_campo.html" with campo=form.cpf %}
+            </div>
+            {% include "partials/_campo.html" with campo=form.telefone %}
+            <div class="campos-duplos">
+                {% include "partials/_campo.html" with campo=form.password1 %}
+                {% include "partials/_campo.html" with campo=form.password2 %}
+            </div>
+
+            <button type="submit" class="btn btn-bloco">{% if funcionario %}Cadastrar funcionário{% else %}Criar conta{% endif %}</button>
+        </form>
+
+        {% if funcionario %}
+            <p class="auth-troca"><a href="{% url 'pedidos:painel' %}">Voltar ao painel</a></p>
+        {% else %}
+            <p class="auth-troca">Já tem conta? <a href="{% url 'usuarios:login' %}">Entrar</a></p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Entrar — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="auth-pagina">
+    <section class="card auth-card">
+        <img src="{% static 'img/logo.png' %}" alt="" class="auth-logo">
+        <h1>Entrar</h1>
+        <p class="muted">Entre com sua matrícula e senha.</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+
+            {% if form.non_field_errors %}
+            <div class="alerta-erro" role="alert">
+                {% for erro in form.non_field_errors %}<p>{{ erro }}</p>{% endfor %}
+            </div>
+            {% endif %}
+
+            {% include "partials/_campo.html" with campo=form.username %}
+            {% include "partials/_campo.html" with campo=form.password %}
+
+            <button type="submit" class="btn btn-bloco">Entrar</button>
+        </form>
+
+        <p class="auth-troca">Ainda não tem conta? <a href="{% url 'usuarios:cadastro' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Cadastre-se</a></p>
+    </section>
+</div>
+{% endblock %}

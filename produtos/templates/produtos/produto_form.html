@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{% if produto %}Editar {{ produto.nome }}{% else %}Novo item{% endif %} — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <nav class="migalhas" aria-label="Você está em">
+        <a href="{% url 'produtos:gerenciar' %}">Itens do cardápio</a>
+        <span aria-hidden="true">/</span>
+        <span>{% if produto %}{{ produto.nome }}{% else %}Novo item{% endif %}</span>
+    </nav>
+
+    <h1>{% if produto %}Editar item{% else %}Adicionar item{% endif %}</h1>
+
+    <form method="post" enctype="multipart/form-data" novalidate class="card form-item">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alerta-erro" role="alert">
+            {% for erro in form.non_field_errors %}<p>{{ erro }}</p>{% endfor %}
+        </div>
+        {% endif %}
+
+        {% include "partials/_campo.html" with campo=form.nome %}
+        {% include "partials/_campo.html" with campo=form.descricao %}
+
+        <div class="campos-duplos">
+            {% include "partials/_campo.html" with campo=form.categoria %}
+            {% include "partials/_campo.html" with campo=form.nova_categoria %}
+        </div>
+
+        <div class="campos-duplos">
+            {% include "partials/_campo.html" with campo=form.preco %}
+            {% include "partials/_campo.html" with campo=form.estoque %}
+        </div>
+
+        {% include "partials/_campo.html" with campo=form.ingredientes %}
+        {% include "partials/_campo.html" with campo=form.novos_ingredientes %}
+        {% include "partials/_campo.html" with campo=form.imagem %}
+        {% include "partials/_campo.html" with campo=form.ativo %}
+
+        <div class="acoes-form">
+            <button type="submit" class="btn">{% if produto %}Salvar alterações{% else %}Adicionar ao cardápio{% endif %}</button>
+            <a href="{% url 'produtos:gerenciar' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

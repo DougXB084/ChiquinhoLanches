@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Cardápio — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="pagina-topo">
+        <div>
+            <h1>Cardápio</h1>
+            <p class="muted">Escolha o que quer comer. Toque no lanche para ver os ingredientes.</p>
+        </div>
+        <form method="get" class="busca" role="search">
+            {% if categoria_atual %}<input type="hidden" name="categoria" value="{{ categoria_atual.pk }}">{% endif %}
+            <label for="busca" class="sr-only">Buscar no cardápio</label>
+            <input type="search" id="busca" name="q" value="{{ busca }}" placeholder="Buscar lanche ou ingrediente" data-filtro-cardapio>
+        </form>
+    </div>
+
+    <div class="chips" aria-label="Categorias">
+        <a class="chip{% if not categoria_atual %} ativo{% endif %}" href="{% url 'produtos:cardapio' %}{% if busca %}?q={{ busca|urlencode }}{% endif %}">Tudo</a>
+        {% for categoria in categorias %}
+        <a class="chip{% if categoria_atual.pk == categoria.pk %} ativo{% endif %}" href="?categoria={{ categoria.pk }}{% if busca %}&q={{ busca|urlencode }}{% endif %}">{{ categoria.nome }}</a>
+        {% endfor %}
+    </div>
+
+    {% if produtos %}
+    <div class="produto-grid" id="lista-produtos">
+        {% for produto in produtos %}
+            {% include "partials/_produto_card.html" %}
+        {% endfor %}
+    </div>
+    <div class="vazio card" id="sem-resultados" hidden>
+        <h3>Nada encontrado</h3>
+        <p class="muted">Tente outro nome ou limpe a busca.</p>
+    </div>
+    {% else %}
+    <div class="vazio card">
+        <h3>Nenhum lanche por aqui</h3>
+        <p class="muted">
+            {% if busca or categoria_atual %}Não achamos itens com esse filtro.{% else %}A cantina ainda não cadastrou itens no cardápio.{% endif %}
+        </p>
+        {% if busca or categoria_atual %}<a href="{% url 'produtos:cardapio' %}" class="btn btn-secondary">Limpar filtros</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

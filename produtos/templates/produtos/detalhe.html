@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ produto.nome }} — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <nav class="migalhas" aria-label="Você está em">
+        <a href="{% url 'produtos:cardapio' %}">Cardápio</a>
+        <span aria-hidden="true">/</span>
+        <a href="{% url 'produtos:cardapio' %}?categoria={{ produto.categoria.pk }}">{{ produto.categoria.nome }}</a>
+    </nav>
+
+    <section class="detalhe">
+        <div class="detalhe-imagem{% if not produto.imagem %} sem-foto{% endif %}">
+            {% if produto.imagem %}
+                <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+            {% else %}
+                <img src="{% static 'img/logo.png' %}" alt="">
+            {% endif %}
+        </div>
+
+        <div class="detalhe-info">
+            <p class="produto-categoria">{{ produto.categoria.nome }}</p>
+            <h1>{{ produto.nome }}</h1>
+            {% if produto.descricao %}<p class="detalhe-descricao">{{ produto.descricao }}</p>{% endif %}
+
+            <div class="ingredientes">
+                <h2>Ingredientes</h2>
+                {% if produto.ingredientes.all %}
+                <ul class="ingredientes-lista">
+                    {% for ingrediente in produto.ingredientes.all %}
+                    <li>{{ ingrediente.nome }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="muted">A cantina ainda não informou os ingredientes deste item.</p>
+                {% endif %}
+            </div>
+
+            <div class="detalhe-compra card">
+                <div>
+                    <strong class="preco preco-grande">R$ {{ produto.preco|floatformat:2 }}</strong>
+                    {% if produto.disponivel %}
+                        <p class="muted estoque">{{ produto.estoque }} disponível{{ produto.estoque|pluralize:"is" }} hoje</p>
+                    {% else %}
+                        <p class="estoque estoque-esgotado">Esgotado no momento</p>
+                    {% endif %}
+                </div>
+
+                {% if usuario_funcionario %}
+                <a href="{% url 'produtos:editar' produto.pk %}" class="btn">Editar item</a>
+                {% elif produto.disponivel %}
+                <form method="post" action="{% url 'pedidos:carrinho_adicionar' produto.pk %}" class="compra-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'pedidos:carrinho' %}">
+                    <div class="stepper">
+                        <button type="button" data-step="-1" aria-label="Diminuir quantidade">−</button>
+                        <input type="number" name="quantidade" value="1" min="1" max="{{ produto.estoque }}" aria-label="Quantidade">
+                        <button type="button" data-step="1" aria-label="Aumentar quantidade">+</button>
+                    </div>
+                    <button type="submit" class="btn">Adicionar ao carrinho</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    {% if relacionados %}
+    <section class="secao">
+        <h2>Mais de {{ produto.categoria.nome }}</h2>
+        <div class="produto-grid">
+            {% for produto in relacionados %}
+                {% include "partials/_produto_card.html" %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

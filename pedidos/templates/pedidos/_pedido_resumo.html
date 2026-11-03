@@ -1,0 +1,21 @@
+<a href="{% url 'pedidos:status' pedido.pk %}" class="pedido-resumo card card-hover">
+    <div class="pedido-resumo-topo">
+        <div>
+            <h3>Pedido #{{ pedido.pk }}</h3>
+            <p class="muted">{{ pedido.data|date:"d/m/Y \à\s H:i" }}</p>
+        </div>
+        {% include "partials/_status.html" %}
+    </div>
+    <ul class="pedido-resumo-itens">
+        {% for item in pedido.itens.all %}
+        <li><span>{{ item.quantidade }}x {{ item.produto.nome }}</span></li>
+        {% endfor %}
+    </ul>
+    {% if pedido.cancelado_pela_cantina %}
+    <p class="pedido-cancelado-nota">
+        Cancelado pela cantina{% if pedido.justificativa_cancelamento %}: {{ pedido.justificativa_cancelamento|truncatechars:90 }}{% endif %}
+        {% if pedido.reembolsado %}<br>Reembolso feito com o cancelamento.{% endif %}
+    </p>
+    {% endif %}
+    <p class="pedido-resumo-total">Total <strong>R$ {{ pedido.total|floatformat:2 }}</strong></p>
+</a>

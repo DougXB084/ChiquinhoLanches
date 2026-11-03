@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Carrinho — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1>Carrinho</h1>
+
+    {% if itens %}
+    <div class="carrinho-layout">
+        <section class="carrinho-itens">
+            {% for item in itens %}
+            <article class="carrinho-item card{% if not item.produto.disponivel %} indisponivel{% endif %}">
+                <a href="{% url 'produtos:detalhe' item.produto.pk %}" class="carrinho-foto{% if not item.produto.imagem %} sem-foto{% endif %}">
+                    {% if item.produto.imagem %}
+                        <img src="{{ item.produto.imagem.url }}" alt="">
+                    {% else %}
+                        <img src="{% static 'img/logo.png' %}" alt="">
+                    {% endif %}
+                </a>
+
+                <div class="carrinho-nome">
+                    <h3><a href="{% url 'produtos:detalhe' item.produto.pk %}">{{ item.produto.nome }}</a></h3>
+                    <p class="muted">R$ {{ item.produto.preco|floatformat:2 }} cada</p>
+                    {% if not item.produto.disponivel %}
+                        <p class="estoque-esgotado">Indisponível — remova para continuar.</p>
+                    {% elif item.quantidade > item.produto.estoque %}
+                        <p class="estoque-esgotado">Restam {{ item.produto.estoque }} unidade(s).</p>
+                    {% endif %}
+                </div>
+
+                <form method="post" action="{% url 'pedidos:carrinho_atualizar' item.pk %}" class="carrinho-qtd" data-autosubmit>
+                    {% csrf_token %}
+                    <div class="stepper">
+                        <button type="button" data-step="-1" aria-label="Diminuir quantidade">−</button>
+                        <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1" max="{{ item.produto.estoque }}" aria-label="Quantidade de {{ item.produto.nome }}">
+                        <button type="button" data-step="1" aria-label="Aumentar quantidade">+</button>
+                    </div>
+                    <noscript><button type="submit" class="btn btn-secondary btn-pequeno">Atualizar</button></noscript>
+                </form>
+
+                <strong class="carrinho-subtotal">R$ {{ item.subtotal|floatformat:2 }}</strong>
+
+                <form method="post" action="{% url 'pedidos:carrinho_remover' item.pk %}" class="carrinho-remover">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-link btn-perigo" aria-label="Remover {{ item.produto.nome }}">Remover</button>
+                </form>
+            </article>
+            {% endfor %}
+        </section>
+
+        <aside class="resumo card">
+            <h2>Resumo</h2>
+            <dl class="resumo-linhas">
+                <div><dt>Itens</dt><dd>{{ carrinho.quantidade_total }}</dd></div>
+                <div class="resumo-total"><dt>Total</dt><dd>R$ {{ total|floatformat:2 }}</dd></div>
+            </dl>
+
+            <form method="post" action="{% url 'pedidos:finalizar' %}">
+                {% csrf_token %}
+                <div class="campo">
+                    <label for="observacao">Observação (opcional)</label>
+                    <textarea id="observacao" name="observacao" maxlength="250" rows="3" placeholder="Ex.: sem cebola"></textarea>
+                </div>
+                <button type="submit" class="btn btn-bloco" {% if tem_indisponivel %}disabled{% endif %}>Enviar pedido</button>
+            </form>
+            <a href="{% url 'produtos:cardapio' %}" class="resumo-voltar">Continuar escolhendo</a>
+        </aside>
+    </div>
+    {% else %}
+    <div class="vazio card">
+        <h3>Seu carrinho está vazio</h3>
+        <p class="muted">Escolha um lanche no cardápio para começar o pedido.</p>
+        <a href="{% url 'produtos:cardapio' %}" class="btn">Ver cardápio</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
