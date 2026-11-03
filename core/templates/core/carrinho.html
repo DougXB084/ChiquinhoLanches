@@ -1,0 +1,25 @@
+
+<!-- carrinho.html -->
+{% extends "base.html" %}
+
+{% block title %}Carrinho | Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<section class="container">
+    <h1>Meu carrinho</h1>
+    <p class="text-muted">Confira os itens que você selecionou.</p>
+
+    <div class="card">
+        <div id="itens-carrinho"></div>
+        <h3 id="total-carrinho">Total: R$ 0,00</h3>
+
+        <button class="btn" type="button" onclick="finalizarPedido()">
+            Finalizar pedido
+        </button>
+
+        <a class="btn btn-secondary" href="{% url 'cardapio' %}">
+            Continuar comprando
+        </a>
+    </div>
+</section>
+{% endblock %}

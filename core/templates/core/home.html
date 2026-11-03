@@ -1,0 +1,45 @@
+
+{% extends "base.html" %}
+
+{% block title %}Início | Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <span class="eyebrow">SUA CANTINA ESCOLAR</span>
+        <h1>Seu intervalo merece um lanche especial.</h1>
+        <p>Confira nosso cardápio e escolha seus favoritos de um jeito simples e rápido.</p>
+        <a href="{% url 'cardapio' %}" class="btn">Explorar cardápio</a>
+    </div>
+    <div class="hero-decoration">🍔</div>
+</section>
+
+<section class="container section">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">FEITO PARA SEU INTERVALO</span>
+            <h2>Mais pedidos</h2>
+        </div>
+        <a href="{% url 'cardapio' %}" class="text-link">Ver cardápio →</a>
+    </div>
+
+    <div class="product-grid">
+        {% for produto in produtos %}
+        <article class="product-card">
+            <div class="product-image-placeholder">🍽️</div>
+            <div class="product-info">
+                <span class="product-category">{{ produto.categoria.nome }}</span>
+                <h3>{{ produto.nome }}</h3>
+                <p>{{ produto.descricao|default:"Uma ótima opção para seu intervalo." }}</p>
+                <div class="product-bottom">
+                    <strong>R$ {{ produto.preco|floatformat:2 }}</strong>
+                    <a href="{% url 'cardapio' %}" class="btn btn-small">Ver produto</a>
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <p class="empty-state">Em breve teremos novidades no cardápio!</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

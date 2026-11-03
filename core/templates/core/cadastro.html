@@ -1,0 +1,42 @@
+
+{% extends "base.html" %}
+
+{% block title %}Cadastro | Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-icon">✨</div>
+        <h1>Crie sua conta</h1>
+        <p>Faça seu cadastro para aproveitar a cantina.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" name="nome"
+                       placeholder="Seu nome" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email"
+                       placeholder="seu@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha"
+                       placeholder="Crie uma senha" required>
+            </div>
+
+            <button type="submit" class="btn btn-full">Criar conta</button>
+        </form>
+
+        <p class="auth-footer">
+            Já possui cadastro?
+            <a href="{% url 'login' %}">Entrar</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+
+{% extends "base.html" %}
+
+{% block title %}Entrar | Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-icon">👋</div>
+        <h1>Bem-vindo de volta!</h1>
+        <p>Acesse sua conta para continuar.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email"
+                       placeholder="seu@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha"
+                       placeholder="Sua senha" required>
+            </div>
+
+            <button type="submit" class="btn btn-full">Entrar</button>
+        </form>
+
+        <p class="auth-footer">
+            Ainda não tem conta?
+            <a href="{% url 'cadastro' %}">Cadastre-se</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

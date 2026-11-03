@@ -1,0 +1,52 @@
+
+{% extends "base.html" %}
+
+{% block title %}Meus pedidos | Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<section class="container section">
+    <div class="page-heading">
+        <span class="eyebrow">ACOMPANHE SEUS PEDIDOS</span>
+        <h1>Meus pedidos</h1>
+        <p>Acompanhe o andamento dos seus pedidos.</p>
+    </div>
+
+    {% if not user.is_authenticated %}
+        <div class="card empty-state">
+            <h3>Entre na sua conta</h3>
+            <p>Você precisa acessar sua conta para visualizar seus pedidos.</p>
+            <a href="{% url 'login' %}" class="btn">Entrar</a>
+        </div>
+    {% else %}
+        <div class="orders-list">
+            {% for pedido in pedidos %}
+            <article class="card order-card">
+                <div class="order-header">
+                    <div>
+                        <span class="text-muted">Pedido #{{ pedido.id }}</span>
+                        <h3>{{ pedido.data|date:"d/m/Y H:i" }}</h3>
+                    </div>
+                    <span class="status status-{{ pedido.status }}">
+                        {{ pedido.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="order-products">
+                    {% for item in pedido.itens.all %}
+                    <p>{{ item.quantidade }}x {{ item.produto.nome }}</p>
+                    {% endfor %}
+                </div>
+
+                <strong>Total: R$ {{ pedido.total|floatformat:2 }}</strong>
+            </article>
+            {% empty %}
+            <div class="card empty-state">
+                <h3>Nenhum pedido por aqui ainda.</h3>
+                <p>Que tal escolher alguma coisa no cardápio?</p>
+                <a href="{% url 'cardapio' %}" class="btn">Ver cardápio</a>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
