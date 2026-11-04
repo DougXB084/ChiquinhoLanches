@@ -7,16 +7,21 @@
 
     <title>{% block title %}Chiquinho Lanches{% endblock %}</title>
 
+    <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="{% static 'js/script.js' %}" defer></script>
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <header>
         {% include "fragments/_header.html" %}
     </header>
 
+    {% include "partials/_mensagens.html" %}
+
     <main>
-        {% block content %}{% endblock %}
+        {% block content %}
+        {% endblock %}
     </main>
 
     <footer>

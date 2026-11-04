@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Meu perfil — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1>Meu perfil</h1>
+
+    <div class="perfil-grid">
+        <section class="card perfil-card">
+            <div class="perfil-topo">
+                <div class="avatar" aria-hidden="true">{{ user.first_name|default:user.username|slice:":1"|upper }}</div>
+                <div>
+                    <h2>{{ user.get_full_name|default:user.username }}</h2>
+                    {% if perfil.eh_funcionario %}<span class="tag">Funcionário da cantina</span>{% endif %}
+                </div>
+            </div>
+
+            <dl class="dados">
+                <div><dt>Matrícula</dt><dd>{{ perfil.matricula|default:"Não informada" }}</dd></div>
+                <div><dt>CPF</dt><dd>{{ perfil.cpf_formatado|default:"Não informado" }}</dd></div>
+                <div><dt>E-mail</dt><dd>{{ user.email|default:"Não informado" }}</dd></div>
+                <div><dt>Telefone</dt><dd>{{ perfil.telefone|default:"Não informado" }}</dd></div>
+                <div><dt>Conta criada em</dt><dd>{{ user.date_joined|date:"d/m/Y" }}</dd></div>
+            </dl>
+
+            <form method="post" action="{% url 'usuarios:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Sair da conta</button>
+            </form>
+        </section>
+
+        <section class="perfil-resumo">
+            {% if usuario_funcionario %}
+            <a href="{% url 'pedidos:painel' %}" class="btn btn-bloco">Ir para o painel da cantina</a>
+            <a href="{% url 'produtos:gerenciar' %}" class="btn btn-secondary btn-bloco">Itens do cardápio</a>
+            {% else %}
+            <div class="card numero-card">
+                <strong>{{ total_pedidos }}</strong>
+                <span class="muted">pedidos feitos</span>
+            </div>
+            <div class="card numero-card">
+                <strong>{{ pedidos_entregues }}</strong>
+                <span class="muted">pedidos entregues</span>
+            </div>
+            <div class="card numero-card">
+                <strong>{{ pedidos_em_andamento }}</strong>
+                <span class="muted">em andamento</span>
+            </div>
+            <a href="{% url 'pedidos:meus_pedidos' %}" class="btn btn-secondary btn-bloco">Ver meus pedidos</a>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

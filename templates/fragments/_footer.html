@@ -1,3 +1,6 @@
+
+{% load static %}
+
 <div class="footer-content">
     <div class="footer-brand">
         <h2>Chiquinho Lanches</h2>
@@ -5,9 +8,14 @@
     </div>
 
     <div class="footer-links">
-        <a href="/">Início</a>
-        <a href="/cardapio/">Cardápio</a>
-        <a href="/meus-pedidos/">Meus pedidos</a>
+        {% if usuario_funcionario %}
+            <a href="{% url 'pedidos:painel' %}">Painel</a>
+            <a href="{% url 'produtos:gerenciar' %}">Itens do cardápio</a>
+        {% else %}
+            <a href="{% url 'core:home' %}">Início</a>
+            <a href="{% url 'produtos:cardapio' %}">Cardápio</a>
+            <a href="{% url 'pedidos:meus_pedidos' %}">Meus pedidos</a>
+        {% endif %}
     </div>
 
     <div class="footer-bottom">

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Pedido #{{ pedido.pk }} — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container"
+     {% if pedido.em_andamento %}data-status-url="{% url 'pedidos:status_json' pedido.pk %}" data-status-atual="{{ pedido.status }}"{% endif %}>
+
+    <nav class="migalhas" aria-label="Você está em">
+        <a href="{% url 'pedidos:meus_pedidos' %}">Meus pedidos</a>
+        <span aria-hidden="true">/</span>
+        <span>Pedido #{{ pedido.pk }}</span>
+    </nav>
+
+    <div class="pagina-topo">
+        <div>
+            <h1>Pedido #{{ pedido.pk }}</h1>
+            <p class="muted">Feito em {{ pedido.data|date:"d/m/Y \à\s H:i" }}{% if pedido.usuario_id != user.pk %} por {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}{% if pedido.usuario.perfil.matricula %} (matrícula {{ pedido.usuario.perfil.matricula }}){% endif %}{% endif %}</p>
+        </div>
+        {% include "partials/_status.html" %}
+    </div>
+
+    {% if pedido.status == "pronto" %}
+    <div class="aviso-pronto" role="status">
+        <strong>Seu pedido está pronto!</strong> Pode retirar na cantina.
+    </div>
+    {% elif pedido.status == "cancelado" %}
+    <div class="alerta-erro aviso-cancelamento" role="status">
+        {% if pedido.cancelado_pela_cantina %}
+            <strong>Este pedido foi cancelado pela cantina.</strong>
+            {% if pedido.justificativa_cancelamento %}<p><b>Justificativa:</b> {{ pedido.justificativa_cancelamento }}</p>{% endif %}
+            {% if pedido.reembolsado %}<p>O reembolso de R$ {{ pedido.total|floatformat:2 }} foi feito com o cancelamento.</p>{% endif %}
+        {% else %}
+            Este pedido foi cancelado.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <section class="card">
+        <h2>Andamento</h2>
+        <ol class="linha-tempo">
+            {% for etapa in etapas %}
+            <li class="etapa etapa-{{ etapa.situacao }}"{% if etapa.situacao == "atual" %} aria-current="step"{% endif %}>
+                <span class="etapa-marca" aria-hidden="true"></span>
+                <div>
+                    <strong>{{ etapa.rotulo }}</strong>
+                    {% if etapa.data %}<span class="muted">{{ etapa.data|date:"H:i" }}</span>{% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ol>
+        {% if pedido.em_andamento %}<p class="muted atualizacao-auto">Esta página atualiza sozinha.</p>{% endif %}
+    </section>
+
+    <div class="status-grid">
+        <section class="card">
+            <h2>Itens do pedido</h2>
+            <ul class="itens-pedido">
+                {% for item in pedido.itens.all %}
+                <li>
+                    <span>{{ item.quantidade }}x <a href="{% url 'produtos:detalhe' item.produto.pk %}">{{ item.produto.nome }}</a></span>
+                    <span>R$ {{ item.subtotal|floatformat:2 }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <p class="pedido-resumo-total">Total <strong>R$ {{ pedido.total|floatformat:2 }}</strong></p>
+            {% if pedido.observacao %}
+            <div class="observacao">
+                <h3>Observação</h3>
+                <p>{{ pedido.observacao }}</p>
+            </div>
+            {% endif %}
+        </section>
+
+        {% if pedido.pode_cancelar and pedido.usuario_id == user.pk %}
+        <section class="card">
+            <h2>Mudou de ideia?</h2>
+            <p class="muted">Você pode cancelar enquanto a cantina ainda não começou a preparar.</p>
+            <form method="post" action="{% url 'pedidos:cancelar' pedido.pk %}" data-confirm="Cancelar o pedido #{{ pedido.pk }}?">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary btn-perigo-borda">Cancelar pedido</button>
+            </form>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

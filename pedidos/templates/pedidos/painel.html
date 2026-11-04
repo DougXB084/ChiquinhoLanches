@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Painel da cantina — Chiquinho Lanches{% endblock %}
+
+{% block content %}
+<div class="page-container" data-auto-reload="30">
+    <div class="pagina-topo">
+        <div>
+            <h1>Painel da cantina</h1>
+            <p class="muted">Pedidos em andamento, do mais antigo para o mais novo.</p>
+        </div>
+        <div class="acoes-topo">
+            <a href="{% url 'usuarios:cadastro_funcionario' %}" class="btn btn-secondary">Cadastrar funcionário</a>
+            <a href="{% url 'produtos:gerenciar' %}" class="btn">Itens do cardápio</a>
+        </div>
+    </div>
+
+    <div class="resumo-painel">
+        <div class="card numero-card"><strong>{{ resumo.em_andamento }}</strong><span class="muted">em andamento</span></div>
+        <div class="card numero-card"><strong>{{ resumo.pedidos_hoje }}</strong><span class="muted">pedidos hoje</span></div>
+        <div class="card numero-card"><strong>{{ resumo.entregues_hoje }}</strong><span class="muted">entregues hoje</span></div>
+        <div class="card numero-card"><strong>R$ {{ resumo.faturamento_hoje|floatformat:2 }}</strong><span class="muted">vendido hoje</span></div>
+    </div>
+
+    <div class="kanban">
+        {% for coluna in colunas %}
+        <section class="kanban-coluna" aria-label="{{ coluna.titulo }}">
+            <header class="kanban-titulo">
+                <h2>{{ coluna.titulo }}</h2>
+                <span class="badge-contador">{{ coluna.pedidos|length }}</span>
+            </header>
+
+            {% for pedido in coluna.pedidos %}
+            <article class="card kanban-card">
+                <div class="kanban-card-topo">
+                    <h3><a href="{% url 'pedidos:status' pedido.pk %}">Pedido #{{ pedido.pk }}</a></h3>
+                    <span class="muted">{{ pedido.data|date:"H:i" }}</span>
+                </div>
+                <p class="kanban-cliente">
+                    {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}
+                </p>
+                <p class="kanban-ident muted">
+                    {% if pedido.usuario.perfil.matricula %}Matrícula {{ pedido.usuario.perfil.matricula }}{% endif %}
+                    {% if pedido.usuario.perfil.cpf %}· CPF {{ pedido.usuario.perfil.cpf_mascarado }}{% endif %}
+                </p>
+                <ul class="pedido-resumo-itens">
+                    {% for item in pedido.itens.all %}
+                    <li><span>{{ item.quantidade }}x {{ item.produto.nome }}</span></li>
+                    {% endfor %}
+                </ul>
+                {% if pedido.observacao %}<p class="kanban-obs">{{ pedido.observacao }}</p>{% endif %}
+                <p class="pedido-resumo-total">Total <strong>R$ {{ pedido.total|floatformat:2 }}</strong></p>
+
+                <div class="kanban-acoes">
+                    {% if pedido.proximo_status %}
+                    <form method="post" action="{% url 'pedidos:painel_avancar' pedido.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-pequeno">Marcar como {{ pedido.proximo_status_rotulo|lower }}</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <details class="cancelar-pedido">
+                    <summary>Cancelar pedido</summary>
+                    <form method="post" action="{% url 'pedidos:painel_cancelar' pedido.pk %}">
+                        {% csrf_token %}
+                        <label for="justificativa-{{ pedido.pk }}">Justificativa (o aluno vai ler)</label>
+                        <textarea id="justificativa-{{ pedido.pk }}" name="justificativa" rows="3" required minlength="5" maxlength="500" placeholder="Ex.: acabou o pão"></textarea>
+                        <p class="muted">O estoque volta e o aluno é avisado de que o reembolso foi feito.</p>
+                        <button type="submit" class="btn btn-pequeno">Confirmar cancelamento</button>
+                    </form>
+                </details>
+            </article>
+            {% empty %}
+            <p class="kanban-vazio muted">Nenhum pedido aqui.</p>
+            {% endfor %}
+        </section>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

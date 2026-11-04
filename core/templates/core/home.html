@@ -1,45 +1,87 @@
-
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Início | Chiquinho Lanches{% endblock %}
+{% block title %}Chiquinho Lanches — peça seu lanche da cantina{% endblock %}
 
 {% block content %}
 <section class="hero">
-    <div class="hero-content">
-        <span class="eyebrow">SUA CANTINA ESCOLAR</span>
-        <h1>Seu intervalo merece um lanche especial.</h1>
-        <p>Confira nosso cardápio e escolha seus favoritos de um jeito simples e rápido.</p>
-        <a href="{% url 'cardapio' %}" class="btn">Explorar cardápio</a>
-    </div>
-    <div class="hero-decoration">🍔</div>
-</section>
-
-<section class="container section">
-    <div class="section-heading">
-        <div>
-            <span class="eyebrow">FEITO PARA SEU INTERVALO</span>
-            <h2>Mais pedidos</h2>
+    <div class="hero-texto">
+        <h1>Escolha o lanche, faça o pedido e retire quando estiver pronto.</h1>
+        <p class="hero-subtitulo">
+            {% if user.is_authenticated %}Olá, {{ user.first_name|default:user.username }}! {% endif %}
+            Veja o cardápio da cantina, monte o carrinho e acompanhe o preparo sem precisar ficar na fila.
+        </p>
+        <div class="hero-acoes">
+            <a href="{% url 'produtos:cardapio' %}" class="btn">Ver cardápio</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'pedidos:meus_pedidos' %}" class="btn btn-secondary">Meus pedidos</a>
+            {% else %}
+                <a href="{% url 'usuarios:cadastro' %}" class="btn btn-secondary">Criar conta</a>
+            {% endif %}
         </div>
-        <a href="{% url 'cardapio' %}" class="text-link">Ver cardápio →</a>
     </div>
-
-    <div class="product-grid">
-        {% for produto in produtos %}
-        <article class="product-card">
-            <div class="product-image-placeholder">🍽️</div>
-            <div class="product-info">
-                <span class="product-category">{{ produto.categoria.nome }}</span>
-                <h3>{{ produto.nome }}</h3>
-                <p>{{ produto.descricao|default:"Uma ótima opção para seu intervalo." }}</p>
-                <div class="product-bottom">
-                    <strong>R$ {{ produto.preco|floatformat:2 }}</strong>
-                    <a href="{% url 'cardapio' %}" class="btn btn-small">Ver produto</a>
-                </div>
-            </div>
-        </article>
-        {% empty %}
-        <p class="empty-state">Em breve teremos novidades no cardápio!</p>
-        {% endfor %}
+    <div class="hero-imagem">
+        <img src="{% static 'img/logo.png' %}" alt="Mascote do Chiquinho Lanches, um hambúrguer sorridente">
     </div>
 </section>
+
+<div class="page-container">
+    {% if pedido_ativo %}
+    <a href="{% url 'pedidos:status' pedido_ativo.pk %}" class="aviso-pedido">
+        <div>
+            <strong>Pedido #{{ pedido_ativo.pk }} em andamento</strong>
+            <span class="muted">Toque para acompanhar</span>
+        </div>
+        {% include "partials/_status.html" with pedido=pedido_ativo %}
+    </a>
+    {% endif %}
+
+    {% if categorias %}
+    <section class="secao">
+        <h2>O que tem na cantina</h2>
+        <div class="chips">
+            {% for categoria in categorias %}
+            <a class="chip" href="{% url 'produtos:cardapio' %}?categoria={{ categoria.pk }}">{{ categoria.nome }}</a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="secao">
+        <div class="secao-topo">
+            <h2>Os queridinhos</h2>
+            <a href="{% url 'produtos:cardapio' %}">Ver tudo</a>
+        </div>
+        {% if destaques %}
+        <div class="produto-grid">
+            {% for produto in destaques %}
+                {% include "partials/_produto_card.html" %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="vazio card">
+            <h3>O cardápio ainda está vazio</h3>
+            <p class="muted">Assim que a cantina cadastrar os lanches, eles aparecem aqui.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="secao">
+        <h2>Como funciona</h2>
+        <ol class="passos">
+            <li class="card">
+                <h3>Escolha</h3>
+                <p class="muted">Navegue pelo cardápio e veja os ingredientes de cada lanche.</p>
+            </li>
+            <li class="card">
+                <h3>Peça</h3>
+                <p class="muted">Confira o carrinho, deixe uma observação se precisar e envie o pedido.</p>
+            </li>
+            <li class="card">
+                <h3>Retire</h3>
+                <p class="muted">Acompanhe o status e vá à cantina quando o pedido estiver pronto.</p>
+            </li>
+        </ol>
+    </section>
+</div>
 {% endblock %}

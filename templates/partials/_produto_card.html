@@ -1,0 +1,33 @@
+{% load static %}
+<article class="produto-card card" data-nome="{{ produto.nome|lower }}">
+    <a href="{% url 'produtos:detalhe' produto.pk %}" class="produto-imagem{% if not produto.imagem %} sem-foto{% endif %}" aria-label="Ver detalhes de {{ produto.nome }}">
+        {% if produto.imagem %}
+            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" loading="lazy">
+        {% else %}
+            <img src="{% static 'img/logo.png' %}" alt="" loading="lazy">
+        {% endif %}
+        {% if not produto.disponivel %}<span class="selo-esgotado">Esgotado</span>{% endif %}
+    </a>
+
+    <div class="produto-corpo">
+        <p class="produto-categoria">{{ produto.categoria.nome }}</p>
+        <h3><a href="{% url 'produtos:detalhe' produto.pk %}">{{ produto.nome }}</a></h3>
+        {% if produto.descricao %}<p class="produto-descricao">{{ produto.descricao|truncatechars:70 }}</p>{% endif %}
+    </div>
+
+    <div class="produto-rodape">
+        <strong class="preco">R$ {{ produto.preco|floatformat:2 }}</strong>
+        {% if usuario_funcionario %}
+        <a href="{% url 'produtos:editar' produto.pk %}" class="btn btn-secondary btn-pequeno">Editar</a>
+        {% elif produto.disponivel %}
+        <form method="post" action="{% url 'pedidos:carrinho_adicionar' produto.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <input type="hidden" name="quantidade" value="1">
+            <button type="submit" class="btn btn-pequeno">Adicionar</button>
+        </form>
+        {% else %}
+        <a href="{% url 'produtos:detalhe' produto.pk %}" class="btn btn-secondary btn-pequeno">Ver</a>
+        {% endif %}
+    </div>
+</article>
